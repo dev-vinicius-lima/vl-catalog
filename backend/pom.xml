@@ -53,7 +53,7 @@
 
     <build>
         <plugins>
-            <!-- plugin para evitar erro de imcompatibilizade de versão ou SO-->
+            <!-- plugin para evitar erro de incompatibilizade de versão ou SO-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
