@@ -1,5 +1,6 @@
 package com.viniciuslima.dscatalog.resources.exceptions;
 
+import com.viniciuslima.dscatalog.services.exceptions.DatabaseException;
 import com.viniciuslima.dscatalog.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,12 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<StandardError> entityNotFound(ResourceNotFoundException e, HttpServletRequest request) {
         StandardError error = new StandardError(Instant.now(), HttpStatus.NOT_FOUND.value(), "Resource not found", e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request) {
+        StandardError error = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), "Database Exception", e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 }
