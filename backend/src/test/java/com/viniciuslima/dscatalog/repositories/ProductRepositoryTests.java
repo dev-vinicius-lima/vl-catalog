@@ -43,4 +43,15 @@ public class ProductRepositoryTests {
         Assertions.assertFalse(result.isPresent());
     }
 
+    @Test
+    public void returnOptionalShouldReturnEmptyWhenIdDoesNotExist() {
+        Optional<Product> product = repository.findById(100L);
+        Assertions.assertTrue(product.isEmpty());
+    }
+
+    @Test
+    public void ShouldReturnNoEmptyWhenIdExists() {
+        Optional<Product> product = repository.findById(1L);
+        Assertions.assertTrue(product.isPresent());
+    }
 }
