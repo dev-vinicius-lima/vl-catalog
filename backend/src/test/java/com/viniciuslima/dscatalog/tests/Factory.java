@@ -10,12 +10,16 @@ public class Factory {
 
     public static Product createProduct() {
         Product product = new Product(1L, "Phone", "Description product", 800.0, "http://github.com/profile", Instant.now());
-        product.getCategories().add((new Category(2L, "Electronics")));
+        product.getCategories().add((createCategory()));
         return product;
     }
 
     public static ProductDTO createProductDto() {
         return new ProductDTO(createProduct(), createProduct().getCategories());
+    }
+
+    public static Category createCategory() {
+        return new Category(2L, "Electronics");
     }
 
 }
