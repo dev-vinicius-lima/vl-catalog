@@ -3,7 +3,6 @@ package com.viniciuslima.dscatalog.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.viniciuslima.dscatalog.dto.ProductDTO;
 import com.viniciuslima.dscatalog.services.ProductService;
-import com.viniciuslima.dscatalog.services.exceptions.DatabaseException;
 import com.viniciuslima.dscatalog.services.exceptions.ResourceNotFoundException;
 import com.viniciuslima.dscatalog.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
