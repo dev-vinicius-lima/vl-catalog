@@ -1,9 +1,6 @@
 package com.viniciuslima.dscatalog.services;
 
-import com.viniciuslima.dscatalog.dto.CategoryDTO;
-import com.viniciuslima.dscatalog.dto.RoleDTO;
-import com.viniciuslima.dscatalog.dto.UserDTO;
-import com.viniciuslima.dscatalog.dto.UserInsertDTO;
+import com.viniciuslima.dscatalog.dto.*;
 import com.viniciuslima.dscatalog.entities.Category;
 import com.viniciuslima.dscatalog.entities.Role;
 import com.viniciuslima.dscatalog.entities.User;
@@ -59,7 +56,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO update(Long id, UserDTO dto) {
+    public UserDTO update(Long id, UserUpdateDTO dto) {
         try {
             User entity = repository.getReferenceById(id);
             copyDtoToEntity(dto, entity);
