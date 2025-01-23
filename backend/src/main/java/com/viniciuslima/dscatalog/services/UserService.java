@@ -1,10 +1,12 @@
 package com.viniciuslima.dscatalog.services;
 
-import com.viniciuslima.dscatalog.dto.*;
-import com.viniciuslima.dscatalog.entities.Category;
+import com.viniciuslima.dscatalog.dto.RoleDTO;
+import com.viniciuslima.dscatalog.dto.UserDTO;
+import com.viniciuslima.dscatalog.dto.UserInsertDTO;
+import com.viniciuslima.dscatalog.dto.UserUpdateDTO;
 import com.viniciuslima.dscatalog.entities.Role;
 import com.viniciuslima.dscatalog.entities.User;
-import com.viniciuslima.dscatalog.repositories.CategoryRepository;
+import com.viniciuslima.dscatalog.projection.UserDetailsProjection;
 import com.viniciuslima.dscatalog.repositories.RoleRepository;
 import com.viniciuslima.dscatalog.repositories.UserRepository;
 import com.viniciuslima.dscatalog.services.exceptions.DatabaseException;
@@ -14,15 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
@@ -31,7 +37,7 @@ public class UserService {
     private RoleRepository roleRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllPaged(Pageable pageable) {
@@ -89,5 +95,23 @@ public class UserService {
             Role role = roleRepository.getReferenceById(roleDto.getId());
             entity.getRoles().add(role);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<UserDetailsProjection> result = repository.searchUserAndRolesByEmail(username);
+        if (result.isEmpty()) {
+            throw new UsernameNotFoundException("Email not found");
+        }
+
+        User user = new User();
+        user.setEmail(result.get(0).getUsername());
+        user.setPassword(result.get(0).getPassword());
+
+        for (UserDetailsProjection projection : result) {
+            user.addRole(new Role(projection.getRoleId(), projection.getAuthority()));
+        }
+
+        return user;
     }
 }
