@@ -94,11 +94,6 @@ public class AuthorizationServerConfig {
         return new InMemoryOAuth2AuthorizationConsentService();
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         // @formatter:off
