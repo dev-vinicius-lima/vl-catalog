@@ -9,6 +9,7 @@ import com.viniciuslima.dscatalog.repositories.CategoryRepository;
 import com.viniciuslima.dscatalog.repositories.ProductRepository;
 import com.viniciuslima.dscatalog.services.exceptions.DatabaseException;
 import com.viniciuslima.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.viniciuslima.dscatalog.util.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -96,14 +97,17 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductDTO> findAllPaged(String name, String categoryId, Pageable pageable) {
         String[] vet = categoryId.split(",");
+
         List<Long> categoriesIds = List.of();
         if (!categoryId.isEmpty()) {
             categoriesIds = Arrays.stream(vet).map(Long::parseLong).toList();
         }
+
         Page<ProductProjection> page = repository.searchProducts(pageable, name, categoriesIds);
         List<Long> productIds = page.map(ProductProjection::getId).toList();
 
         List<Product> entities = repository.searchProductsWithCategories(productIds);
+        entities = (List<Product>) Utils.replace(page.getContent(), entities);
         List<ProductDTO> dto = entities.stream().map(x -> new ProductDTO(x, x.getCategories())).toList();
 
         return new PageImpl<>(dto, page.getPageable(), page.getTotalElements());

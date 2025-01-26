@@ -1,5 +1,6 @@
 package com.viniciuslima.dscatalog.entities;
 
+import com.viniciuslima.dscatalog.projection.IdProjection;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -10,7 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tb_product")
-public class Product {
+public class Product implements IdProjection<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,9 +25,7 @@ public class Product {
     private Instant date;
 
     @ManyToMany
-    @JoinTable(name = "tb_product_category",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
     public Product() {
@@ -41,6 +40,7 @@ public class Product {
         this.date = date;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
