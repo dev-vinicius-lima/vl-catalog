@@ -22,12 +22,12 @@ public class ProductResource {
     private ProductService service;
 
     @GetMapping
-    public ResponseEntity<Page<ProductProjection>> findAll(
+    public ResponseEntity<Page<ProductDTO>> findAll(
             @RequestParam(value = "name", defaultValue = "") String name,
             @RequestParam(name = "categoryId", defaultValue = "") String categoryId,
             Pageable pageable
     ) {
-        Page<ProductProjection> productList = service.findAllPaged(name, categoryId, pageable);
+        Page<ProductDTO> productList = service.findAllPaged(name, categoryId, pageable);
         return ResponseEntity.ok(productList);
     }
 
