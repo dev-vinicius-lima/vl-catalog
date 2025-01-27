@@ -1,6 +1,7 @@
 package com.viniciuslima.dscatalog.resources.exceptions;
 
 import com.viniciuslima.dscatalog.services.exceptions.DatabaseException;
+import com.viniciuslima.dscatalog.services.exceptions.EmailException;
 import com.viniciuslima.dscatalog.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,12 @@ public class ResourceExceptionHandler {
             error.addError(f.getField(), f.getDefaultMessage());
         }
 
+        return ResponseEntity.status(error.getStatus()).body(error);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<StandardError> email(EmailException e, HttpServletRequest request) {
+        StandardError error = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), "Email Exception", e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(error.getStatus()).body(error);
     }
 }
