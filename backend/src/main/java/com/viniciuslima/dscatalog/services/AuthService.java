@@ -1,17 +1,21 @@
 package com.viniciuslima.dscatalog.services;
 
 import com.viniciuslima.dscatalog.dto.EmailUserDTO;
+import com.viniciuslima.dscatalog.dto.NewPasswordDTO;
 import com.viniciuslima.dscatalog.entities.PasswordRecover;
 import com.viniciuslima.dscatalog.entities.User;
 import com.viniciuslima.dscatalog.repositories.PasswordRecoverRepository;
 import com.viniciuslima.dscatalog.repositories.UserRepository;
 import com.viniciuslima.dscatalog.services.exceptions.ResourceNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,6 +29,9 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Value("${email.password-recover.token.minutes}")
     private Long tokenMinutes;
@@ -43,7 +50,7 @@ public class AuthService {
 
         String token = UUID.randomUUID().toString();
 
-        String stringFormat = "Olá, " + user.getFirstName() + ".\n\n" + "Você solicitou a recuperação de senha para a sua conta de email " + user.getEmail() + " Clique no link abaixo para alterar a sua senha: \n\n" + recoverURI + token + "Seu token expirará em " + tokenMinutes + " Minutos" + "\n\n" + " Se você não solicitou a recuperação de senha, por favor, ignore este e-mail.\n\n";
+        String stringFormat = "Olá, " + user.getFirstName() + ".\n\n" + "Você solicitou a recuperação de senha para a sua conta de email " + user.getEmail() + " Clique no link abaixo para alterar a sua senha: \n\n" + recoverURI + token + " Seu token expirará em " + tokenMinutes + " Minutos" + "\n\n" + " Se você não solicitou a recuperação de senha, por favor, ignore este e-mail.\n\n";
 
         PasswordRecover entity = new PasswordRecover();
         entity.setEmail(user.getEmail());
@@ -53,5 +60,16 @@ public class AuthService {
 
         emailService.sendEmail(entity.getEmail(), "Recuperação de senha", stringFormat);
 
+    }
+
+    @Transactional
+    public void saveNewPassword(NewPasswordDTO body) {
+        List<PasswordRecover> result = repository.searchValidTokens(body.getToken(), Instant.now());
+        if (result.isEmpty()) {
+            throw new ResourceNotFoundException("Token inválido ou expirado");
+        }
+        User user = userRepository.findByEmail(result.get(0).getEmail());
+        user.setPassword(passwordEncoder.encode(body.getPassword()));
+        user = userRepository.save(user);
     }
 }
